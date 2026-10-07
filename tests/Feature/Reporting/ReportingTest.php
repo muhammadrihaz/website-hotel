@@ -92,6 +92,27 @@ class ReportingTest extends TestCase
         $this->assertStringContainsString('Net Revenue', $response->streamedContent());
     }
 
+    public function test_daily_revenue_table_displays_the_latest_date_first(): void
+    {
+        $this->seed(RolePermissionSeeder::class);
+        $user = User::factory()->create();
+        $user->givePermissionTo('report.view');
+        $today = CarbonImmutable::today(config('app.timezone'));
+
+        $response = $this->actingAs($user)->get(route('reports.revenue', [
+            'start_date' => $today->subDays(2)->toDateString(),
+            'end_date' => $today->toDateString(),
+        ]));
+
+        $response
+            ->assertOk()
+            ->assertSeeInOrder([
+                'data-date="'.$today->toDateString().'"',
+                'data-date="'.$today->subDay()->toDateString().'"',
+                'data-date="'.$today->subDays(2)->toDateString().'"',
+            ], escape: false);
+    }
+
     public function test_report_date_filter_rejects_invalid_and_excessive_ranges(): void
     {
         $this->seed(RolePermissionSeeder::class);

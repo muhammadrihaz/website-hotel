@@ -1,6 +1,7 @@
 @php
     $summary = $reportData['summary'];
     $daily = $reportData['daily'];
+    $dailyTable = $daily->sortByDesc('date')->values();
     $maxRevenue = max((float) $daily->max('net_revenue'), 1);
     $chartWidth = max(760, $daily->count() * 34);
 @endphp
@@ -62,8 +63,8 @@
                 <table class="w-full min-w-[1240px] text-left text-sm">
                     <thead class="bg-slate-50 text-xs uppercase tracking-wider text-slate-500"><tr><th class="px-5 py-3 sm:px-6">Tanggal check-in</th><th class="px-4 py-3">Reservasi</th><th class="px-4 py-3 text-right">Room</th><th class="px-4 py-3 text-right">Tambahan</th><th class="px-4 py-3 text-right">Diskon</th><th class="px-4 py-3 text-right">Net</th><th class="px-4 py-3 text-right">Pembayaran</th><th class="px-4 py-3 text-right">Deposit jaminan</th><th class="px-5 py-3 text-right sm:px-6">Saldo</th></tr></thead>
                     <tbody class="divide-y divide-slate-100">
-                        @foreach($daily as $row)
-                            <tr class="hover:bg-slate-50/70">
+                        @foreach($dailyTable as $row)
+                            <tr class="hover:bg-slate-50/70" data-date="{{ $row['date'] }}">
                                 <td class="px-5 py-3 font-bold text-slate-800 sm:px-6">{{ \Carbon\Carbon::parse($row['date'])->translatedFormat('d M Y') }}</td>
                                 <td class="px-4 py-3 text-slate-600">{{ $row['reservations'] }}</td>
                                 <td class="px-4 py-3 text-right text-slate-600">Rp{{ number_format($row['room_revenue'], 0, ',', '.') }}</td>
