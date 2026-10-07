@@ -6,6 +6,8 @@ services:
     restart: unless-stopped
     env_file:
       - .env.docker
+    ports:
+      - "127.0.0.1:${MYSQL_PORT:-33063}:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:

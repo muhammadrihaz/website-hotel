@@ -9,7 +9,7 @@ Blueprint arsitektur, database, ERD, workflow, permission matrix, roadmap, dan r
 Stack produksi memakai PHP 8.3 + Apache dan MySQL 8.4. Konfigurasi ini disiapkan untuk server `jdacserver` dengan pemetaan berikut:
 
 - aplikasi: `127.0.0.1:8084` pada host ke port container `80`;
-- MySQL: hanya tersedia di network internal Compose, tanpa port host;
+- MySQL: tersedia pada `127.0.0.1:33063` untuk koneksi DBeaver melalui SSH Tunnel;
 - Vite: tidak dijalankan di server karena aset frontend dibangun ke dalam image.
 
 Port `8084` dipilih agar tidak bertabrakan dengan port `80`, `8080`, `8081`, `8082`, dan `8083` yang sudah digunakan container lain. Dari direktori proyek di server, siapkan environment produksi:
@@ -65,6 +65,18 @@ docker compose --env-file .env.docker down
 ```
 
 Data disimpan dalam named volume `daniela-hotel_mysql_data` dan `daniela-hotel_app_storage`. Hindari `docker compose down -v` karena opsi `-v` menghapus kedua volume tersebut.
+
+### Akses database melalui DBeaver
+
+MySQL sengaja hanya dipublikasikan pada loopback server agar tidak terbuka langsung ke internet. Buat koneksi MySQL di DBeaver dengan pengaturan utama:
+
+- Host: `127.0.0.1`
+- Port: `33063`
+- Database: `website_hotel`
+- Username: nilai `DB_USERNAME` dari `.env.docker`
+- Password: nilai `DB_PASSWORD` dari `.env.docker`
+
+Aktifkan tab **SSH Tunnel** di DBeaver, lalu isi host SSH dengan IP/domain server, port `22`, username SSH server, dan private key atau password SSH Anda. Tidak perlu membuka port `33063` di UFW karena koneksi database melewati SSH.
 
 ## Requirements tanpa Docker
 
