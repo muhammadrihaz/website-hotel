@@ -8,7 +8,7 @@ Blueprint arsitektur, database, ERD, workflow, permission matrix, roadmap, dan r
 
 Stack produksi memakai PHP 8.3 + Apache dan MySQL 8.4. Konfigurasi ini disiapkan untuk server `jdacserver` dengan pemetaan berikut:
 
-- aplikasi: port host `8084` ke port container `80`;
+- aplikasi: `127.0.0.1:8084` pada host ke port container `80`;
 - MySQL: hanya tersedia di network internal Compose, tanpa port host;
 - Vite: tidak dijalankan di server karena aset frontend dibangun ke dalam image.
 
@@ -30,7 +30,7 @@ unset HOTEL_APP_KEY HOTEL_DB_PASSWORD HOTEL_ROOT_PASSWORD
 chmod 600 .env.docker
 ```
 
-Edit `APP_URL` di `.env.docker` menjadi alamat yang benar, misalnya `http://IP-SERVER:8084` atau `https://hotel.example.com` jika memakai reverse proxy. Lalu validasi dan jalankan stack:
+Konfigurasi bawaan memakai `APP_URL=https://sistemhotel.muhammadrihaz.my.id` untuk Cloudflare Tunnel. Published application Cloudflare harus diarahkan ke `http://127.0.0.1:8084`; TLS berakhir di Cloudflare dan Laravel mempercayai header forwarded HTTPS dari Tunnel. Lalu validasi dan jalankan stack:
 
 ```bash
 docker compose --env-file .env.docker config --quiet
@@ -52,7 +52,7 @@ curl -fsS http://127.0.0.1:8084/up
 docker compose --env-file .env.docker logs --tail=100 app mysql
 ```
 
-Aplikasi dapat diakses langsung melalui `http://IP-SERVER:8084`. Jika UFW aktif dan port akan diakses langsung dari luar, izinkan `8084/tcp`; jika memakai reverse proxy, port tersebut sebaiknya hanya dibuka sesuai kebutuhan proxy.
+Aplikasi diakses melalui `https://sistemhotel.muhammadrihaz.my.id`. Port `8084` hanya terikat ke localhost agar origin tidak dapat dilewati langsung dari internet.
 
 Untuk update berikutnya, upload/pull source terbaru lalu jalankan kembali `docker compose --env-file .env.docker up -d --build`. Jangan menjalankan seeder lagi kecuali memang ingin menyelaraskan master bawaan.
 
